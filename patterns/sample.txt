@@ -1,0 +1,140 @@
+// create pipelines
+new xoutput topleft 100 100 480 270
+new xoutput topright 100 100 480 270
+new xoutput bottomleft 100 100 480 270
+new xoutput bottomright 100 100 480 270
+new aoutput a_out
+new mp3input audio files/bad_timing.mp3
+new mp4input video files/eggman.mp4
+// macro a pipeline
+raw flipcrop 3 proxysrc name=video_in ! videoflip name=flip ! videobox name=crop ! proxysink name=video_out
+flip video-direction GstOrientation $1
+crop alpha float $2
+crop border-alpha float $3
+war
+raw teefour 0 proxysrc name=video_in ! tee name=t t. ! proxysink name=video_1 t. ! proxysink name=video_2 t. ! proxysink name=video_3 t. ! proxysink name=video_4
+war
+// use pipeline in views
+new flipcrop tlmod 0 1.0 1.0
+new flipcrop trmod 0 1.0 1.0
+new flipcrop blmod 0 1.0 1.0
+new flipcrop brmod 0 1.0 1.0
+new teefour t4
+// plug things together
+plug audio_out audio audio_in a_out
+plug video_out video video_in t4
+plug video_1 t4 video_in tlmod
+plug video_2 t4 video_in trmod
+plug video_3 t4 video_in blmod
+plug video_4 t4 video_in brmod
+plug video_out tlmod video_in topleft
+plug video_out trmod video_in topright
+plug video_out blmod video_in bottomleft
+plug video_out brmod video_in bottomright
+// everything but inputs are active
+on pre wrap
+act a_out play start
+act t4 play start
+act topleft play start
+act topright play start
+act bottomleft play start
+act bottomright play start
+act tlmod play start
+act trmod play start
+act blmod play start
+act brmod play start
+parw
+// define some initial settings
+on callback a_out end terminate
+on pre act audio play start
+on pre wrap
+act video play pause
+act topleft play pause
+act topleft window show
+parw
+// real meat and potatoes
+on progress a_out 0.723 wrap
+act video play start
+act topleft play start
+act topleft seek 0.0 1.0
+parw
+on progress a_out 1.066 act topright window show
+on progress a_out 1.666 act video seek 0.0 1.0
+on progress a_out 1.666 wrap
+act topright window move a_out 1.666 100 100 2.119 600 100 mcos mcos
+parw
+on progress a_out 2.119 act bottomleft window show
+on progress a_out 2.619 act video seek 0.0 1.0
+on progress a_out 2.619 wrap
+act bottomleft window move a_out 2.619 100 100 3.116 100 390 mcos mcos
+parw
+on progress a_out 3.116 act bottomright window show
+on progress a_out 3.616 act video seek 0.0 1.0
+on progress a_out 3.616 wrap
+act bottomright window move a_out 3.616 100 100 4.113 600 390 mcos mcos
+parw
+on progress a_out 5.481 wrap
+act topleft window move a_out 5.481 100 100 5.781 600 100 mcos mcos
+act topright window move a_out 5.481 600 100 5.781 600 390 mcos mcos
+act bottomright window move a_out 5.481 600 390 5.781 100 390 mcos mcos
+act bottomleft window move a_out 5.481 100 390 5.781 100 100 mcos mcos
+parw
+on progress a_out 5.731 wrap
+act tlmod prop flip video-direction GstOrientation 1
+act trmod prop flip video-direction GstOrientation 3
+act blmod prop flip video-direction GstOrientation 1
+act brmod prop flip video-direction GstOrientation 3
+act video seek 0.0 1.0
+parw
+on progress a_out 5.913 wrap
+act tlmod prop flip video-direction GstOrientation 0
+act trmod prop flip video-direction GstOrientation 0
+act blmod prop flip video-direction GstOrientation 0
+act brmod prop flip video-direction GstOrientation 0
+parw
+on progress a_out 6.213 wrap
+act topleft window move a_out 6.213 600 100 6.727 600 390 mcos mcos
+act topright window move a_out 6.213 600 390 6.727 100 390 mcos mcos
+act bottomright window move a_out 6.213 100 390 6.727 100 100 mcos mcos
+act bottomleft window move a_out 6.213 100 100 6.727 600 100 mcos mcos
+parw
+on progress a_out 6.717 wrap
+act tlmod prop flip video-direction GstOrientation 2
+act trmod prop flip video-direction GstOrientation 2
+act blmod prop flip video-direction GstOrientation 2
+act brmod prop flip video-direction GstOrientation 2
+act video seek 0.0 1.0
+parw
+on progress a_out 6.867 wrap
+act tlmod prop flip video-direction GstOrientation 0
+act trmod prop flip video-direction GstOrientation 0
+act blmod prop flip video-direction GstOrientation 0
+act brmod prop flip video-direction GstOrientation 0
+parw
+on progress a_out 7.167 wrap
+act topleft window move a_out 7.167 600 390 7.659 100 100 mcos mcos
+act topright window move a_out 7.167 100 390 7.659 600 100 mcos mcos
+act bottomright window move a_out 7.167 100 100 7.659 600 390 mcos mcos
+act bottomleft window move a_out 7.167 600 100 7.659 100 390 mcos mcos
+parw
+on progress a_out 7.649 wrap
+act video seek 0.0 1.0
+// These values are based off of the source dimensions... somewhat.
+act tlmod prop crop left int -656
+act tlmod prop crop right int 656
+act tlmod prop crop top int -400
+act tlmod prop crop bottom int 400
+act trmod prop crop left int 656
+act trmod prop crop right int -656
+act trmod prop crop top int -400
+act trmod prop crop bottom int 400
+act blmod prop crop left int -656
+act blmod prop crop right int 656
+act blmod prop crop top int 400
+act blmod prop crop bottom int -400
+act brmod prop crop left int 656
+act brmod prop crop right int -656
+act brmod prop crop top int 400
+act brmod prop crop bottom int -400
+parw
+// lets go
