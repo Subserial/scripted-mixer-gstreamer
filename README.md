@@ -3,7 +3,7 @@
 A small interpreter to control gstreamer pipelines.  
 Made for Acid Unicorns: New Tricks.  
 
-This is a personal project.
+This is a personal project. I will be adding a retrospective soon.
 
 ## Contributing
 
